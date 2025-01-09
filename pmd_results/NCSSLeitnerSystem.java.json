@@ -1,0 +1,26 @@
+{
+  "formatVersion": 0,
+  "pmdVersion": "7.9.0",
+  "timestamp": "2025-01-09T07:57:18.875-03:00",
+  "files": [
+    {
+      "filename": "C:\\Users\\Luigu\\Desktop\\Program\\LLMCodeSmellRefactor\\src\\main\\java\\org\\example\\studycards\\LeitnerSystem.java",
+      "violations": [
+        {
+          "beginline": 44,
+          "begincolumn": 19,
+          "endline": 44,
+          "endcolumn": 32,
+          "description": "The method \u0027getRandomCard(List\u003cBox\u003e)\u0027 has a NCSS line count of 17.",
+          "rule": "NcssCount",
+          "ruleset": "Design",
+          "priority": 3,
+          "externalInfoUrl": "https://docs.pmd-code.org/pmd-doc-7.9.0/pmd_rules_java_design.html#ncsscount"
+        }
+      ]
+    }
+  ],
+  "suppressedViolations": [],
+  "processingErrors": [],
+  "configurationErrors": []
+}
