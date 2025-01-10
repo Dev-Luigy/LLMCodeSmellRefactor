@@ -4,60 +4,96 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 
 public class SearchLog {
-    private final List<String> searchHistory;
-    private final Map<String, Integer> searchCount;
+    private List<String> searchHistory;
+    private Map<String, Integer> searchCount;
     private boolean isLocked;
     private Integer numUsages;
     private String logName;
 
     public SearchLog(String logName) {
-        this.searchHistory = new ArrayList<>();
-        this.searchCount = new HashMap<>();
+        searchHistory = new ArrayList<>();
+        searchCount = new HashMap<>();
         this.logName = logName;
-        this.numUsages = 0;
-        this.isLocked = false;
+        numUsages = 0;
+        isLocked = false;
     }
 
-    // Mantido para compatibilidade com código existente
-    public void addSearchHistory(String searchTerm) {
+    // Método para gerenciar busca geral
+    public void handleSearch(String searchTerm) {
         if (isLocked) {
-            throw new IllegalStateException("Cannot add search to a locked log");
+            throw new IllegalStateException("Search log is locked");
         }
-        searchHistory.add(searchTerm);
+
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            throw new IllegalArgumentException("Search term cannot be empty");
+        }
+
+        addSearchHistory(searchTerm);
         searchCount.merge(searchTerm, 1, Integer::sum);
+        numUsages++;
+    }
+
+    // Método para gerenciar busca de materiais
+    public void handleMaterialSearch(String searchTerm) {
+        if (isLocked) {
+            throw new IllegalStateException("Search log is locked");
+        }
+
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            throw new IllegalArgumentException("Search term cannot be empty");
+        }
+
+        String materialSearchTerm = "MATERIAL:" + searchTerm;
+        addSearchHistory(materialSearchTerm);
+        searchCount.merge(materialSearchTerm, 1, Integer::sum);
+        numUsages++;
+    }
+
+    // Método para gerenciar busca de registros
+    public void handleRegistrySearch(String searchTerm) {
+        if (isLocked) {
+            throw new IllegalStateException("Search log is locked");
+        }
+
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            throw new IllegalArgumentException("Search term cannot be empty");
+        }
+
+        String registrySearchTerm = "REGISTRY:" + searchTerm;
+        addSearchHistory(registrySearchTerm);
+        searchCount.merge(registrySearchTerm, 1, Integer::sum);
+        numUsages++;
+    }
+
+    public void addSearchHistory(String searchHistory) {
+        if (isLocked) {
+            throw new IllegalStateException("Search log is locked");
+        }
+        this.searchHistory.add(searchHistory);
     }
 
     public List<String> getSearchHistory() {
-        return new ArrayList<>(searchHistory); // Retorna uma cópia para evitar modificação direta
+        return new ArrayList<>(searchHistory); // Retorna uma cópia para proteger a lista original
     }
 
-    // Mantido para compatibilidade
     public void setSearchHistory(List<String> searchHistory) {
         if (isLocked) {
-            throw new IllegalStateException("Cannot modify a locked log");
+            throw new IllegalStateException("Search log is locked");
         }
-        this.searchHistory.clear();
-        if (searchHistory != null) {
-            this.searchHistory.addAll(searchHistory);
-        }
+        this.searchHistory = new ArrayList<>(searchHistory); // Cria uma cópia da lista
     }
 
     public Map<String, Integer> getSearchCount() {
-        return new HashMap<>(searchCount); // Retorna uma cópia para evitar modificação direta
+        return new HashMap<>(searchCount); // Retorna uma cópia para proteger o mapa original
     }
 
-    // Mantido para compatibilidade
     public void setSearchCount(Map<String, Integer> searchCount) {
         if (isLocked) {
-            throw new IllegalStateException("Cannot modify a locked log");
+            throw new IllegalStateException("Search log is locked");
         }
-        this.searchCount.clear();
-        if (searchCount != null) {
-            this.searchCount.putAll(searchCount);
-        }
+        this.searchCount = new HashMap<>(searchCount); // Cria uma cópia do mapa
     }
 
     public boolean isLocked() {
@@ -74,7 +110,7 @@ public class SearchLog {
 
     public void setNumUsages(Integer numUsages) {
         if (isLocked) {
-            throw new IllegalStateException("Cannot modify a locked log");
+            throw new IllegalStateException("Search log is locked");
         }
         this.numUsages = numUsages;
     }
@@ -85,22 +121,8 @@ public class SearchLog {
 
     public void setLogName(String logName) {
         if (isLocked) {
-            throw new IllegalStateException("Cannot modify a locked log");
+            throw new IllegalStateException("Search log is locked");
         }
         this.logName = logName;
-    }
-
-    // Novos métodos úteis que podem ser usados em futuras implementações
-    public void clearHistory() {
-        if (isLocked) {
-            throw new IllegalStateException("Cannot clear history of a locked log");
-        }
-        searchHistory.clear();
-        searchCount.clear();
-        numUsages = 0;
-    }
-
-    public int getSearchFrequency(String searchTerm) {
-        return searchCount.getOrDefault(searchTerm, 0);
     }
 }
