@@ -3,14 +3,14 @@ package org.example.studyplanner;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class TodoTracker {
-    private final List<ToDo> toDos;
-    private final Map<Integer, List<LocalDateTime>> tracker;
+    private List<ToDo> toDos = new ArrayList<>();
+    private Map<Integer, List<LocalDateTime>> tracker;
     private Integer nextId;
     private static TodoTracker instance;
+
 
     private TodoTracker() {
         this.tracker = new HashMap<>();
@@ -27,82 +27,77 @@ public class TodoTracker {
 
     @Override
     public String toString() {
-        if (toDos.isEmpty()) {
-            return "No ToDos found";
-        }
-        return buildToDoString();
-    }
-
-    private String buildToDoString() {
         StringBuilder str = new StringBuilder();
         for (ToDo toDo : toDos) {
-            appendToDoInfo(str, toDo);
+            String todoInfo = toDo.toString();
+            str.append(todoInfo);
+            str.append("\n");
+            Integer id = toDo.getId();
+            List<LocalDateTime> todosDate = this.tracker.get(id);
+            if(todosDate == null){
+                str.append("No tracks found\n");
+            }else{
+                for (LocalDateTime ldt : todosDate) {
+                    String pattern = "yyyy-MM-dd HH:mm:ss";
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                    String formattedDate = formatter.format(ldt);
+                    str.append(formattedDate);
+                    str.append("\n");
+                }
+            }
         }
-        return str.toString();
-    }
-
-    private void appendToDoInfo(StringBuilder str, ToDo toDo) {
-        str.append(toDo.toString()).append("\n");
-        appendTrackerDates(str, toDo.getId());
-    }
-
-    private void appendTrackerDates(StringBuilder str, Integer id) {
-        List<LocalDateTime> todosDate = this.tracker.get(id);
-        if (todosDate == null) {
-            str.append("No tracks found\n");
-            return;
+        String response = str.toString();
+        if(response.isEmpty()){
+            return "No ToDos found";
         }
-        appendFormattedDates(str, todosDate);
+        return response;
     }
 
-    private void appendFormattedDates(StringBuilder str, List<LocalDateTime> dates) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        for (LocalDateTime ldt : dates) {
-            str.append(formatter.format(ldt)).append("\n");
-        }
-    }
-
-    public void addToDoExecutionTime(Integer id) {
+    public void addToDoExecutionTime(Integer id){
         List<LocalDateTime> et = tracker.computeIfAbsent(id, k -> new ArrayList<>());
-        et.add(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        et.add(now);
     }
 
     public List<ToDo> getToDos() {
-        return new ArrayList<>(toDos);
+        return toDos;
     }
 
     public ToDo getToDoById(Integer id) {
-        return toDos.stream()
-                .filter(todo -> todo.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        for (ToDo toDo : toDos) {
+            if (toDo.getId() == id) {
+                return toDo;
+            }
+        }
+        return null;
     }
 
     public Integer addToDo(String title, String description, Integer priority) {
-        ToDo newToDo = new ToDo(nextId, title, description, priority);
-        toDos.add(newToDo);
-        return nextId++;
+        ToDo toAdd = new ToDo(nextId, title, description, priority);
+        nextId++;
+        this.toDos.add(toAdd);
+        return toAdd.getId();
     }
 
     public void removeToDo(Integer id) {
-        toDos.removeIf(toDo -> toDo.getId().equals(id));
+        toDos.removeIf(toDo -> toDo.getId() == id);
     }
 
     public List<ToDo> sortTodosByPriority() {
-        return toDos.stream()
-                .sorted(Comparator.comparingInt(ToDo::getPriority))
-                .collect(Collectors.toList());
+        List<ToDo> sortedToDos = new ArrayList<>(toDos);
+        sortedToDos.sort(Comparator.comparingInt(ToDo::getPriority));
+        return sortedToDos;
     }
 
     public List<String> searchInTodos(String search) {
-        return toDos.stream()
-                .filter(todo -> containsSearchTerm(todo, search.toLowerCase()))
-                .map(ToDo::toString)
-                .collect(Collectors.toList());
+        List<String> todos = new ArrayList<>();
+        for (ToDo toDo : toDos) {
+            if (toDo.getTitle().toLowerCase().contains(search.toLowerCase()) || toDo.getDescription().toLowerCase().contains(search.toLowerCase())) {
+                todos.add(toDo.toString());
+            }
+        }
+        return todos;
     }
 
-    private boolean containsSearchTerm(ToDo todo, String searchTerm) {
-        return todo.getTitle().toLowerCase().contains(searchTerm) ||
-                todo.getDescription().toLowerCase().contains(searchTerm);
-    }
+
 }
