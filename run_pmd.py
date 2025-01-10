@@ -21,7 +21,7 @@ def run_pmd(directory):
     """
     for root, _, files in os.walk(directory):
         for file in files:
-            if file.endswith(".java") and file == "StudyPlan.java":
+            if file.endswith(".java") and file == "StudyTaskManager.java":
                 # Caminho completo do arquivo Java
                 file_path = os.path.join(root, file)
                 # Nome do arquivo de saída do relatório
