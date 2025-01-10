@@ -86,20 +86,4 @@ public class CompoundHabitInfo {
             return new CompoundHabitInfo(this);
         }
     }
-
-    public HabitDTO toHabitDTO() {
-        return new HabitDTO.Builder()
-                .withName(name)
-                .withMotivation(motivation)
-                .withDailyMinutesDedication(dailyMinutes)
-                .withDailyHoursDedication(dailyHours)
-                .withYear(year)
-                .withMonth(month)
-                .withDay(day)
-                .withHour(hour)
-                .withMinute(minute)
-                .withSeconds(seconds)
-                .withIsConcluded(isConcluded)
-                .build();
-    }
 }

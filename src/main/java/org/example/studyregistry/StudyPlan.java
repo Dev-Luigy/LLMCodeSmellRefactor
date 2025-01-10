@@ -6,107 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-// Group parameters related to the objective details
-class ObjectiveDetails {
-    private String mainObjectiveTitle;
-    private String mainGoalTitle;
-    private String mainMaterialTopic;
-    private String mainTask;
-
-    public ObjectiveDetails(String mainObjectiveTitle, String mainGoalTitle, String mainMaterialTopic, String mainTask) {
-        this.mainObjectiveTitle = mainObjectiveTitle;
-        this.mainGoalTitle = mainGoalTitle;
-        this.mainMaterialTopic = mainMaterialTopic;
-        this.mainTask = mainTask;
-    }
-
-    // Getters
-    public String getMainObjectiveTitle() { return mainObjectiveTitle; }
-    public String getMainGoalTitle() { return mainGoalTitle; }
-    public String getMainMaterialTopic() { return mainMaterialTopic; }
-    public String getMainTask() { return mainTask; }
-
-    // Add behavior methods
-    public String summarizeObjective() {
-        return String.format("Objective: %s, Goal: %s", mainObjectiveTitle, mainGoalTitle);
-    }
-
-    public String detailedDescription() {
-        return String.format("Objective: %s\nGoal: %s\nMaterial Topic: %s\nTask: %s",
-                mainObjectiveTitle, mainGoalTitle, mainMaterialTopic, mainTask);
-    }
-}
-
-// Main StepDetails class
-class StepDetails {
-    private String firstStep;
-    private String resetStudyMechanism;
-    private String consistentStep;
-    private String seasonalSteps;
-    private String basicSteps;
-    private Integer numberOfSteps;
-    private boolean isImportant;
-    private ObjectiveDetails objectiveDetails;
-
-    public StepDetails(String firstStep, String resetStudyMechanism, String consistentStep, String seasonalSteps,
-                       String basicSteps, Integer numberOfSteps, boolean isImportant,
-                       ObjectiveDetails objectiveDetails) {
-        this.firstStep = firstStep;
-        this.resetStudyMechanism = resetStudyMechanism;
-        this.consistentStep = consistentStep;
-        this.seasonalSteps = seasonalSteps;
-        this.basicSteps = basicSteps;
-        this.numberOfSteps = numberOfSteps;
-        this.isImportant = isImportant;
-        this.objectiveDetails = objectiveDetails;
-    }
-
-    // Getters
-    public String getFirstStep() { return firstStep; }
-    public String getResetStudyMechanism() { return resetStudyMechanism; }
-    public String getConsistentStep() { return consistentStep; }
-    public String getSeasonalSteps() { return seasonalSteps; }
-    public String getBasicSteps() { return basicSteps; }
-    public Integer getNumberOfSteps() { return numberOfSteps; }
-    public boolean isImportant() { return isImportant; }
-    public ObjectiveDetails getObjectiveDetails() { return objectiveDetails; }
-
-    // Behavior methods
-    public String summarizeSteps() {
-        return String.format("First Step: %s, Consistent Step: %s, Seasonal Steps: %s", firstStep, consistentStep, seasonalSteps);
-    }
-
-    public String detailedSteps() {
-        return String.format("First Step: %s\nReset Mechanism: %s\nConsistent Step: %s\nSeasonal Steps: %s\nBasic Steps: %s\nNumber of Steps: %d\nImportant: %b",
-                firstStep, resetStudyMechanism, consistentStep, seasonalSteps, basicSteps, numberOfSteps, isImportant);
-    }
-
-    public boolean validateSteps() {
-        return firstStep != null && !firstStep.isEmpty() &&
-                consistentStep != null && !consistentStep.isEmpty() &&
-                numberOfSteps != null && numberOfSteps > 0;
-    }
-
-    public String formatForDisplay() {
-        return String.format("Step Details:\n- %s\n- %s\n- %s\n- %s\n- %s\n- Number of Steps: %d\n- Important: %b\n%s",
-                firstStep, resetStudyMechanism, consistentStep, seasonalSteps, basicSteps, numberOfSteps, isImportant, objectiveDetails.detailedDescription());
-    }
-}
-
-class DateRange {
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-
-    public DateRange(LocalDateTime startDate, LocalDateTime endDate) {
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
-
-    // Getters
-    public LocalDateTime getStartDate() { return startDate; }
-    public LocalDateTime getEndDate() { return endDate; }
-}
-
 public class StudyPlan extends Registry {
     private StudyObjective objective;
     private List<String> steps;
@@ -138,12 +37,8 @@ public class StudyPlan extends Registry {
         steps.add(toAdd);
     }
 
-    public void assignSteps(StepDetails stepDetails, DateRange dateRange) {
+    public void assignSteps(StepDetails stepDetails) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-
-        if (!stepDetails.validateSteps()) {
-            throw new IllegalArgumentException("Invalid step details");
-        }
 
         this.steps = new ArrayList<>(Arrays.asList(
                 stepDetails.getFirstStep(),
@@ -151,24 +46,165 @@ public class StudyPlan extends Registry {
                 stepDetails.getConsistentStep(),
                 stepDetails.getSeasonalSteps(),
                 stepDetails.getBasicSteps(),
-                "Number of steps: " + stepDetails.getNumberOfSteps(),
+                "Number of steps: " + stepDetails.getNumberOfSteps().toString(),
                 "Is it important to you? " + stepDetails.isImportant(),
-                dateRange.getStartDate().format(formatter),
-                dateRange.getEndDate().format(formatter),
-                stepDetails.getObjectiveDetails().getMainObjectiveTitle(),
-                stepDetails.getObjectiveDetails().getMainGoalTitle(),
-                stepDetails.getObjectiveDetails().getMainMaterialTopic(),
-                stepDetails.getObjectiveDetails().getMainTask()
+                stepDetails.getStartDate().format(formatter),
+                stepDetails.getEndDate().format(formatter),
+                stepDetails.getMainObjectiveTitle(),
+                stepDetails.getMainGoalTitle(),
+                stepDetails.getMainMaterialTopic(),
+                stepDetails.getMainTask()
         ));
     }
 
     public void handleAssignSteps(List<String> stringProperties, Integer numberOfSteps, boolean isImportant, LocalDateTime startDate, LocalDateTime endDate) {
-        ObjectiveDetails objectiveDetails = new ObjectiveDetails(
-                stringProperties.get(5), stringProperties.get(6), stringProperties.get(7), stringProperties.get(8));
-        StepDetails stepDetails = new StepDetails(
-                stringProperties.get(0), stringProperties.get(1), stringProperties.get(2), stringProperties.get(3),
-                stringProperties.get(4), numberOfSteps, isImportant, objectiveDetails);
-        DateRange dateRange = new DateRange(startDate, endDate);
-        assignSteps(stepDetails, dateRange);
+        StepDetails stepDetails = new StepDetails()
+                .setFirstStep(stringProperties.get(0))
+                .setResetStudyMechanism(stringProperties.get(1))
+                .setConsistentStep(stringProperties.get(2))
+                .setSeasonalSteps(stringProperties.get(3))
+                .setBasicSteps(stringProperties.get(4))
+                .setMainObjectiveTitle(stringProperties.get(5))
+                .setMainGoalTitle(stringProperties.get(6))
+                .setMainMaterialTopic(stringProperties.get(7))
+                .setMainTask(stringProperties.get(8))
+                .setNumberOfSteps(numberOfSteps)
+                .setImportant(isImportant)
+                .setStartDate(startDate)
+                .setEndDate(endDate);
+        assignSteps(stepDetails);
+    }
+
+    public static class StepDetails {
+        private String firstStep;
+        private String resetStudyMechanism;
+        private String consistentStep;
+        private String seasonalSteps;
+        private String basicSteps;
+        private String mainObjectiveTitle;
+        private String mainGoalTitle;
+        private String mainMaterialTopic;
+        private String mainTask;
+        private Integer numberOfSteps;
+        private boolean important;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+
+        public StepDetails setFirstStep(String firstStep) {
+            this.firstStep = firstStep;
+            return this;
+        }
+
+        public StepDetails setResetStudyMechanism(String resetStudyMechanism) {
+            this.resetStudyMechanism = resetStudyMechanism;
+            return this;
+        }
+
+        public StepDetails setConsistentStep(String consistentStep) {
+            this.consistentStep = consistentStep;
+            return this;
+        }
+
+        public StepDetails setSeasonalSteps(String seasonalSteps) {
+            this.seasonalSteps = seasonalSteps;
+            return this;
+        }
+
+        public StepDetails setBasicSteps(String basicSteps) {
+            this.basicSteps = basicSteps;
+            return this;
+        }
+
+        public StepDetails setMainObjectiveTitle(String mainObjectiveTitle) {
+            this.mainObjectiveTitle = mainObjectiveTitle;
+            return this;
+        }
+
+        public StepDetails setMainGoalTitle(String mainGoalTitle) {
+            this.mainGoalTitle = mainGoalTitle;
+            return this;
+        }
+
+        public StepDetails setMainMaterialTopic(String mainMaterialTopic) {
+            this.mainMaterialTopic = mainMaterialTopic;
+            return this;
+        }
+
+        public StepDetails setMainTask(String mainTask) {
+            this.mainTask = mainTask;
+            return this;
+        }
+
+        public StepDetails setNumberOfSteps(Integer numberOfSteps) {
+            this.numberOfSteps = numberOfSteps;
+            return this;
+        }
+
+        public StepDetails setImportant(boolean important) {
+            this.important = important;
+            return this;
+        }
+
+        public StepDetails setStartDate(LocalDateTime startDate) {
+            this.startDate = startDate;
+            return this;
+        }
+
+        public StepDetails setEndDate(LocalDateTime endDate) {
+            this.endDate = endDate;
+            return this;
+        }
+
+        public String getFirstStep() {
+            return firstStep;
+        }
+
+        public String getResetStudyMechanism() {
+            return resetStudyMechanism;
+        }
+
+        public String getConsistentStep() {
+            return consistentStep;
+        }
+
+        public String getSeasonalSteps() {
+            return seasonalSteps;
+        }
+
+        public String getBasicSteps() {
+            return basicSteps;
+        }
+
+        public String getMainObjectiveTitle() {
+            return mainObjectiveTitle;
+        }
+
+        public String getMainGoalTitle() {
+            return mainGoalTitle;
+        }
+
+        public String getMainMaterialTopic() {
+            return mainMaterialTopic;
+        }
+
+        public String getMainTask() {
+            return mainTask;
+        }
+
+        public Integer getNumberOfSteps() {
+            return numberOfSteps;
+        }
+
+        public boolean isImportant() {
+            return important;
+        }
+
+        public LocalDateTime getStartDate() {
+            return startDate;
+        }
+
+        public LocalDateTime getEndDate() {
+            return endDate;
+        }
     }
 }
