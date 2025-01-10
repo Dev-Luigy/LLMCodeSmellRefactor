@@ -20,7 +20,12 @@ public class SearchLog {
         isLocked = false;
     }
 
-    // Método para gerenciar busca geral
+    public List<String> handleSearchAndGetResults(String searchTerm, List<String> searchResults) {
+        handleSearch(searchTerm);
+        searchResults.add("\nLogged in: " + this.logName);
+        return searchResults;
+    }
+
     public void handleSearch(String searchTerm) {
         if (isLocked) {
             throw new IllegalStateException("Search log is locked");
@@ -35,7 +40,6 @@ public class SearchLog {
         numUsages++;
     }
 
-    // Método para gerenciar busca de materiais
     public void handleMaterialSearch(String searchTerm) {
         if (isLocked) {
             throw new IllegalStateException("Search log is locked");
@@ -51,7 +55,6 @@ public class SearchLog {
         numUsages++;
     }
 
-    // Método para gerenciar busca de registros
     public void handleRegistrySearch(String searchTerm) {
         if (isLocked) {
             throw new IllegalStateException("Search log is locked");
@@ -75,25 +78,25 @@ public class SearchLog {
     }
 
     public List<String> getSearchHistory() {
-        return new ArrayList<>(searchHistory); // Retorna uma cópia para proteger a lista original
+        return new ArrayList<>(searchHistory);
     }
 
     public void setSearchHistory(List<String> searchHistory) {
         if (isLocked) {
             throw new IllegalStateException("Search log is locked");
         }
-        this.searchHistory = new ArrayList<>(searchHistory); // Cria uma cópia da lista
+        this.searchHistory = new ArrayList<>(searchHistory);
     }
 
     public Map<String, Integer> getSearchCount() {
-        return new HashMap<>(searchCount); // Retorna uma cópia para proteger o mapa original
+        return new HashMap<>(searchCount);
     }
 
     public void setSearchCount(Map<String, Integer> searchCount) {
         if (isLocked) {
             throw new IllegalStateException("Search log is locked");
         }
-        this.searchCount = new HashMap<>(searchCount); // Cria uma cópia do mapa
+        this.searchCount = new HashMap<>(searchCount);
     }
 
     public boolean isLocked() {

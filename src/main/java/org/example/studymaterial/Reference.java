@@ -180,4 +180,9 @@ public abstract class Reference {
         return title != null && !title.trim().isEmpty() &&
                 link != null && !link.trim().isEmpty();
     }
+
+    public String getCombinedText() {
+        return (this.title != null ? this.title : "") +
+                (this.description != null ? this.description : "");
+    }
 }
