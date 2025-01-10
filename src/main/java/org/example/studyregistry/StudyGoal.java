@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StudyGoal extends Registry{
+public class StudyGoal extends Registry {
     private String goal;
     private List<String> goalRequirements;
     private Boolean isCompleted;
@@ -21,67 +21,50 @@ public class StudyGoal extends Registry{
         goalRequirements = new ArrayList<>();
     }
 
-    public void editActiveCompleted(boolean active, boolean completed){
+    public void editActiveCompleted(boolean active, boolean completed) {
         this.isActive = active;
         this.isCompleted = completed;
     }
 
-    public String setGoalSummary(){
-        StringBuilder summary = new StringBuilder();
-        summary.append("Goal Summary:\n").append("\n\n");
-        if(this.isActive){
-            summary.append("Active Goal:\n").append(goal).append("\n\n");
+    private void appendGoalStatus(StringBuilder builder) {
+        if (this.isActive) builder.append("Active Goal:\n").append(goal).append("\n\n");
+        if (this.isCompleted) builder.append("Completed Goal:\n").append(goal).append("\n\n");
+    }
+
+    private void appendRequirements(StringBuilder builder) {
+        if (this.goalRequirements != null) {
+            builder.append("Requirements:\n");
+            this.goalRequirements.forEach(requirement -> builder.append(requirement).append(", "));
         }
-        if(this.isCompleted){
-            summary.append("Completed Goal:\n").append(goal).append("\n\n");
-        }
-        if(this.goalRequirements != null){
-            summary.append("Requirements:\n");
-            for(String requirement : this.goalRequirements){
-                summary.append(requirement).append(", ");
-            }
-        }
-        if(this.studyPlan != null){
-            summary.append("Plan:\n");
-            summary.append(this.studyPlan.toString());
-        }
-        if(this.studyObjective != null){
-            summary.append("Objective:\n");
-            summary.append(this.studyObjective.toString());
-        }
-        this.summary = summary.toString();
-        return summary.toString();
     }
 
-    public void addRequirement(String requirement){
-        this.goalRequirements.add(requirement);
+    private void appendPlanAndObjective(StringBuilder builder) {
+        if (this.studyPlan != null) builder.append("Plan:\n").append(this.studyPlan.toString());
+        if (this.studyObjective != null) builder.append("Objective:\n").append(this.studyObjective.toString());
     }
 
-    public void resetRequirements(){
-        this.goalRequirements.clear();
+    public String setGoalSummary() {
+        StringBuilder summaryBuilder = new StringBuilder().append("Goal Summary:\n\n");
+        appendGoalStatus(summaryBuilder);
+        appendRequirements(summaryBuilder);
+        appendPlanAndObjective(summaryBuilder);
+        this.summary = summaryBuilder.toString();
+        return this.summary;
     }
 
-    public boolean isCompleted() {
-        return isCompleted;
-    }
+    public void addRequirement(String requirement) { this.goalRequirements.add(requirement); }
 
-    public void toggleIsCompleted(){
-        this.isCompleted = !this.isCompleted;
-    }
+    public void resetRequirements() { this.goalRequirements.clear(); }
 
-    public LocalDateTime getLimitDate() {
-        return createdDate;
-    }
+    public boolean isCompleted() { return isCompleted; }
 
-    public void setLimitDate(LocalDateTime limitDate) {
-        this.createdDate = limitDate;
-    }
+    public void toggleIsCompleted() { this.isCompleted = !this.isCompleted; }
 
-    public void addDaysLimitDate(int days){
-        this.createdDate = this.createdDate.plusDays(days);
-    }
+    public LocalDateTime getLimitDate() { return createdDate; }
 
-    public void setGoal(String goal) {
-        this.goal = goal;
-    }
+    public void setLimitDate(LocalDateTime limitDate) { this.createdDate = limitDate; }
+
+    public void addDaysLimitDate(int days) { this.createdDate = this.createdDate.plusDays(days); }
+
+    public void setGoal(String goal) { this.goal = goal; }
 }
